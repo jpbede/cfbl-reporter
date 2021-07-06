@@ -5,8 +5,8 @@ github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/go-test/deep v1.0.7 h1:/VSMRlnY/JSyqxQUzQLKVMAskpY/NZKFA5j2P+0pP2M=
 github.com/go-test/deep v1.0.7/go.mod h1:QV8Hv/iy04NyLBxAdO9njL0iVPN1S4d/A3NVv1V36o8=
-github.com/jpbede/go-dkim v0.0.0-20210706180255-325e8799287c h1:W12h38hMWWwNzq3RCmN1+xnJnTZakvbc+bn8+RIylkg=
-github.com/jpbede/go-dkim v0.0.0-20210706180255-325e8799287c/go.mod h1:3/Nw5Y3U9Gma5NORfiU3aR+nk+NOcp2URtzLli74IKk=
+github.com/jpbede/go-dkim v0.0.0-20210706184804-5069ad4f6b15 h1:RTenZn+rjY/tCJP8EHvSyXqg3WISFuoJzFBPz8G3FaY=
+github.com/jpbede/go-dkim v0.0.0-20210706184804-5069ad4f6b15/go.mod h1:3/Nw5Y3U9Gma5NORfiU3aR+nk+NOcp2URtzLli74IKk=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/russross/blackfriday/v2 v2.0.1 h1:lPqVAte+HuHNfhJ/0LC98ESWRz8afy9tM/0RK8m9o+Q=

@@ -9,4 +9,4 @@ require (
 	github.com/urfave/cli/v2 v2.3.0
 )
 
-replace github.com/toorop/go-dkim v0.0.0-20201103131630-e1cd1a0a5208 => github.com/jpbede/go-dkim v0.0.0-20210706180255-325e8799287c
+replace github.com/toorop/go-dkim v0.0.0-20201103131630-e1cd1a0a5208 => github.com/jpbede/go-dkim v0.0.0-20210706184804-5069ad4f6b15

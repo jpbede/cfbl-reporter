@@ -2,12 +2,13 @@ package cfbl
 
 import (
 	"bytes"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/toorop/go-dkim"
 	"net/mail"
 	"net/textproto"
 	"strings"
 )
+
+var cfblHeaderName = "Complaint-FBL-Address"
 
 func CheckRequirements(mailBytes []byte) (bool, error) {
 	msg, parseErr := mail.ReadMessage(bytes.NewReader(mailBytes))
@@ -16,12 +17,11 @@ func CheckRequirements(mailBytes []byte) (bool, error) {
 	}
 
 	// Is Complaint-FBL-Address header there ?
-	if len(msg.Header[textproto.CanonicalMIMEHeaderKey("Complaint-FBL-Address")]) == 0 {
+	if len(msg.Header[textproto.CanonicalMIMEHeaderKey(cfblHeaderName)]) == 0 {
 		return false, ErrMissingComplaintFBLAddressHeader
 	}
 
-	// Has CFBL Address domain a DKIM header ?
-	addrParts := strings.Split(msg.Header.Get("Complaint-FBL-Address"), ";")
+	addrParts := strings.Split(msg.Header.Get(cfblHeaderName), ";")
 	addr, err := mail.ParseAddress(addrParts[0])
 	if err != nil {
 		return false, err
@@ -38,14 +38,25 @@ func CheckRequirements(mailBytes []byte) (bool, error) {
 		return false, err
 	}
 
-	dkHeader, err := dkim.GetHeaderForDomain(&mailBytes, cfbldomain)
+	// Has this signature the required tags
+	return hasHeaderCoverageByDKIM(&mailBytes, &cfbldomain)
+}
+
+func hasHeaderCoverageByDKIM(mailBytes *[]byte, cfblDomain *string) (bool, error) {
+	dkHeader, err := dkim.GetHeaderForDomain(mailBytes, *cfblDomain)
 	if err != nil {
 		return false, err
-	} else if dkHeader == nil {
-		return false, ErrCFBLDomainNotAligned
 	}
 
-	spew.Dump(dkHeader)
-
+	found := false
+	for _, header := range dkHeader.Headers {
+		if strings.ToLower(header) == strings.ToLower(cfblHeaderName) {
+			found = true
+			break
+		}
+	}
+	if !found {
+		return false, ErrDKIMSigMissingHeader
+	}
 	return true, nil
 }
