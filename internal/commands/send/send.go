@@ -3,7 +3,6 @@ package send
 import (
 	"bufio"
 	"fmt"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/urfave/cli/v2"
 	"go.bnck.me/cfbl-reporter/internal/commands"
 	"go.bnck.me/cfbl-reporter/pkg/cfbl"
@@ -31,7 +30,10 @@ func runSend(c *cli.Context) error {
 		reader := bufio.NewReader(os.Stdin)
 		all, _ := io.ReadAll(reader)
 
-		spew.Dump(cfbl.CheckRequirements(all))
+		cfbl.CheckRequirements(all)
+
+		report, _ := cfbl.ComposeARFReport(&all, false)
+		fmt.Print(string(report))
 	}
 
 	return nil

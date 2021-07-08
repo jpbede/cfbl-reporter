@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-var cfblHeaderName = "Complaint-FBL-Address"
+var cfblHeaderName = "CFBL-Address"
 
 func CheckRequirements(mailBytes []byte) (bool, error) {
 	msg, parseErr := mail.ReadMessage(bytes.NewReader(mailBytes))
@@ -18,7 +18,7 @@ func CheckRequirements(mailBytes []byte) (bool, error) {
 
 	// Is Complaint-FBL-Address header there ?
 	if len(msg.Header[textproto.CanonicalMIMEHeaderKey(cfblHeaderName)]) == 0 {
-		return false, ErrMissingComplaintFBLAddressHeader
+		return false, ErrMissingCFBLAddressHeader
 	}
 
 	addrParts := strings.Split(msg.Header.Get(cfblHeaderName), ";")
