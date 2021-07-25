@@ -30,10 +30,12 @@ func runSend(c *cli.Context) error {
 		reader := bufio.NewReader(os.Stdin)
 		all, _ := io.ReadAll(reader)
 
-		cfbl.CheckRequirements(all)
+		report := cfbl.NewReport(&all)
 
-		report, _ := cfbl.ComposeARFReport(&all, false)
-		fmt.Print(string(report))
+		arfReport, _ := report.ComposeARFReport(false,
+			cfbl.WithFrom("FBL Senffder", "fbl@exmaple.com"),
+		)
+		fmt.Print(string(arfReport))
 	}
 
 	return nil

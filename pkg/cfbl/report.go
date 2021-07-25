@@ -9,39 +9,54 @@ import (
 	"strings"
 )
 
-func ComposeARFReport(originMailBytes *[]byte, reportFullMail bool) ([]byte, error) {
-	envelopMsg := gomail.NewMessage()
-	envelopMsg.SetCustomMultipartType("report")
-	envelopMsg.SetAddressHeader("From", "fbl@example.com", "FBL Sender")
+type Report struct {
+	arfReport    *gomail.Message
+	originalMail *[]byte
+}
 
-	msg, err := mail.ReadMessage(bytes.NewReader(*originMailBytes))
+func (r *Report) ComposeARFReport(reportFullMail bool, opts ...ComposerOption) ([]byte, error) {
+	// first check the requirement
+	if _, err := r.CheckRequirements(); err != nil {
+		return nil, err
+	}
+
+	envelopeMsg := gomail.NewMessage()
+	envelopeMsg.SetCustomMultipartType("report")
+
+	for _, opt := range opts {
+		opt(envelopeMsg)
+	}
+
+	msg, err := mail.ReadMessage(bytes.NewReader(*r.originalMail))
 	if err != nil {
 		return nil, err
 	}
 
 	// add a plain text part for email clients
 	rp := strings.Trim(msg.Header.Get("Return-Path"), "<>")
-	envelopMsg.AddAlternative("text/plain",
+	envelopeMsg.AddAlternative("text/plain",
 		fmt.Sprintf("This is an email abuse report for an email message from %s on %s", rp, msg.Header.Get("Date")))
 
 	// add the report itself
-	envelopMsg.AddAlternative("message/feedback-report", getReportFields(msg))
+	envelopeMsg.AddAlternative("message/feedback-report", getReportFields(msg))
 
 	// add the headers of the original mail, or if given full original mail
 	if reportFullMail {
-		envelopMsg.AddAlternativeWriter("text/rfc822", func(writer io.Writer) error {
-			_, err := writer.Write(*originMailBytes)
+		envelopeMsg.AddAlternativeWriter("text/rfc822", func(writer io.Writer) error {
+			_, err := writer.Write(*r.originalMail)
 			return err
 		})
 	} else {
-		envelopMsg.AddAlternative("text/rfc822-headers", getHeaderForReport(msg))
+		envelopeMsg.AddAlternative("text/rfc822-headers", getHeaderForReport(msg))
 	}
 
 	// now write the complete report to buffer
 	msgBuffer := new(bytes.Buffer)
-	if _, err := envelopMsg.WriteTo(msgBuffer); err != nil {
+	if _, err := envelopeMsg.WriteTo(msgBuffer); err != nil {
 		return nil, err
 	}
+
+	r.arfReport = envelopeMsg
 
 	return msgBuffer.Bytes(), nil
 }

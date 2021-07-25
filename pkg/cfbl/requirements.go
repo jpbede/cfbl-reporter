@@ -10,8 +10,8 @@ import (
 
 var cfblHeaderName = "CFBL-Address"
 
-func CheckRequirements(mailBytes []byte) (bool, error) {
-	msg, parseErr := mail.ReadMessage(bytes.NewReader(mailBytes))
+func (r *Report) CheckRequirements() (bool, error) {
+	msg, parseErr := mail.ReadMessage(bytes.NewReader(*r.originalMail))
 	if parseErr != nil {
 		return false, parseErr
 	}
@@ -34,12 +34,12 @@ func CheckRequirements(mailBytes []byte) (bool, error) {
 	}
 
 	// Verify DKIM signature for CFBL domain
-	if _, err := dkim.VerifyByDomain(&mailBytes, cfbldomain); err != nil {
+	if _, err := dkim.VerifyByDomain(r.originalMail, cfbldomain); err != nil {
 		return false, err
 	}
 
 	// Has this signature the required tags
-	return hasHeaderCoverageByDKIM(&mailBytes, &cfbldomain)
+	return hasHeaderCoverageByDKIM(r.originalMail, &cfbldomain)
 }
 
 func hasHeaderCoverageByDKIM(mailBytes *[]byte, cfblDomain *string) (bool, error) {
