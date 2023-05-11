@@ -8,15 +8,13 @@ import (
 	"strings"
 )
 
-var cfblHeaderName = "CFBL-Address"
-
 func (r *Report) CheckRequirements() (bool, error) {
 	msg, parseErr := mail.ReadMessage(bytes.NewReader(*r.originalMail))
 	if parseErr != nil {
 		return false, parseErr
 	}
 
-	// Is Complaint-FBL-Address header there ?
+	// Is CFBL-Address header there ?
 	if len(msg.Header[textproto.CanonicalMIMEHeaderKey(cfblHeaderName)]) == 0 {
 		return false, ErrMissingCFBLAddressHeader
 	}

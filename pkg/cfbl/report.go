@@ -32,6 +32,13 @@ func (r *Report) ComposeARFReport(reportFullMail bool, opts ...ComposerOption) (
 		return nil, err
 	}
 
+	addrParts := strings.Split(msg.Header.Get(cfblHeaderName), ";")
+	addr, err := mail.ParseAddress(addrParts[0])
+	if err != nil {
+		return nil, err
+	}
+	envelopeMsg.SetAddressHeader("To", addr.Address, "")
+
 	// add a plain text part for email clients
 	rp := strings.Trim(msg.Header.Get("Return-Path"), "<>")
 	envelopeMsg.AddAlternative("text/plain",
@@ -77,7 +84,7 @@ func getHeaderForReport(msg *mail.Message) string {
 	var fields string
 
 	fields += fmt.Sprintf("Message-ID: %s\r\n", strings.Trim(msg.Header.Get("Message-ID"), "<>"))
-	if cfblFeedbackID := msg.Header.Get("CFBL-Feedback-ID"); cfblFeedbackID != "" {
+	if cfblFeedbackID := msg.Header.Get(cfblFeedbackID); cfblFeedbackID != "" {
 		fields += fmt.Sprintf("CFBL-Feedback-ID: %s\r\n", cfblFeedbackID)
 	}
 
