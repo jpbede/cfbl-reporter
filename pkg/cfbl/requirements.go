@@ -19,25 +19,25 @@ func (r *Report) CheckRequirements() (bool, error) {
 		return false, ErrMissingCFBLAddressHeader
 	}
 
-	addrParts := strings.Split(msg.Header.Get(cfblHeaderName), ";")
-	addr, err := mail.ParseAddress(addrParts[0])
+	cfblParts := strings.Split(msg.Header.Get(cfblHeaderName), ";")
+	addr, err := mail.ParseAddress(cfblParts[0])
 	if err != nil {
 		return false, err
 	}
 
-	var cfbldomain string
-	t := strings.SplitAfter(addr.Address, "@")
-	if len(t) > 1 {
-		cfbldomain = strings.ToLower(t[1])
+	var cfblDomain string
+	addrParts := strings.SplitAfter(addr.Address, "@")
+	if len(addrParts) > 1 {
+		cfblDomain = strings.ToLower(addrParts[1])
 	}
 
 	// Verify DKIM signature for CFBL domain
-	if _, err := dkim.VerifyByDomain(r.originalMail, cfbldomain); err != nil {
+	if _, err := dkim.VerifyByDomain(r.originalMail, cfblDomain); err != nil {
 		return false, err
 	}
 
 	// Has this signature the required tags
-	return hasHeaderCoverageByDKIM(r.originalMail, &cfbldomain)
+	return hasHeaderCoverageByDKIM(r.originalMail, &cfblDomain)
 }
 
 func hasHeaderCoverageByDKIM(mailBytes *[]byte, cfblDomain *string) (bool, error) {
@@ -46,15 +46,10 @@ func hasHeaderCoverageByDKIM(mailBytes *[]byte, cfblDomain *string) (bool, error
 		return false, err
 	}
 
-	found := false
 	for _, header := range dkHeader.Headers {
 		if strings.ToLower(header) == strings.ToLower(cfblHeaderName) {
-			found = true
-			break
+			return true, nil
 		}
 	}
-	if !found {
-		return false, ErrDKIMSigMissingHeader
-	}
-	return true, nil
+	return false, ErrDKIMSigMissingHeader
 }

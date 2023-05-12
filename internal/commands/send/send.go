@@ -24,6 +24,7 @@ func runSend(c *cli.Context) error {
 	if err != nil {
 		panic(err)
 	}
+
 	if fi.Mode()&os.ModeNamedPipe == 0 {
 		fmt.Println("no pipe :(")
 	} else {
@@ -32,8 +33,8 @@ func runSend(c *cli.Context) error {
 
 		report := cfbl.NewReport(&all)
 
-		arfReport, _ := report.ComposeARFReport(false,
-			cfbl.WithFrom("FBL Senffder", "fbl@exmaple.com"),
+		arfReport, _ := report.ComposeARFReport(
+			cfbl.WithFrom("FBL Sender", "fbl@exmaple.com"),
 		)
 		fmt.Print(string(arfReport))
 	}

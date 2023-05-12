@@ -2,7 +2,8 @@ package cfbl
 
 func NewReport(originalMail *[]byte) *Report {
 	report := &Report{
-		originalMail: originalMail,
+		originalMail:   originalMail,
+		sendFullReport: false,
 	}
 	return report
 }

@@ -9,5 +9,5 @@ var (
 
 	ErrCFBLDomainNotAligned = errors.New("CFBL Address domain not aligned with DKIM signature")
 
-	ErrDKIMSigMissingHeader = errors.New("DKIM signature doesn't cover CFBL-Address header")
+	ErrDKIMSigMissingHeader = errors.New("DKIM signature doesn't contain CFBL-Address header")
 )

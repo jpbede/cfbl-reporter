@@ -10,11 +10,12 @@ import (
 )
 
 type Report struct {
-	arfReport    *gomail.Message
-	originalMail *[]byte
+	arfReport      *gomail.Message
+	originalMail   *[]byte
+	sendFullReport bool
 }
 
-func (r *Report) ComposeARFReport(reportFullMail bool, opts ...ComposerOption) ([]byte, error) {
+func (r *Report) ComposeARFReport(opts ...ComposerOption) ([]byte, error) {
 	// first check the requirement
 	if _, err := r.CheckRequirements(); err != nil {
 		return nil, err
@@ -24,7 +25,7 @@ func (r *Report) ComposeARFReport(reportFullMail bool, opts ...ComposerOption) (
 	envelopeMsg.SetCustomMultipartType("report")
 
 	for _, opt := range opts {
-		opt(envelopeMsg)
+		opt(envelopeMsg, r)
 	}
 
 	msg, err := mail.ReadMessage(bytes.NewReader(*r.originalMail))
@@ -48,7 +49,7 @@ func (r *Report) ComposeARFReport(reportFullMail bool, opts ...ComposerOption) (
 	envelopeMsg.AddAlternative("message/feedback-report", getReportFields(msg))
 
 	// add the headers of the original mail, or if given full original mail
-	if reportFullMail {
+	if r.sendFullReport {
 		envelopeMsg.AddAlternativeWriter("text/rfc822", func(writer io.Writer) error {
 			_, err := writer.Write(*r.originalMail)
 			return err
